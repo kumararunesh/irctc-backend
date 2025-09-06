@@ -1,5 +1,6 @@
 package com.arunesh.irctc.irctc_backend.entities;
 
+import com.arunesh.irctc.irctc_backend.annotations.ValidCoach;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,6 +13,7 @@ public class Train {
     private String trainNo ;
     @Pattern(regexp="^[A-Za-z]+([ -][A-Za-z]+)*$\n", message="Only alphabets spaces and hyphens are allowed ")
     private String name;
+    @ValidCoach
     private int coaches;
 
     public Train() {

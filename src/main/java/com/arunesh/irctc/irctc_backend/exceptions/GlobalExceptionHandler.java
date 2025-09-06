@@ -3,11 +3,14 @@ package com.arunesh.irctc.irctc_backend.exceptions;
 import com.arunesh.irctc.irctc_backend.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -33,9 +36,21 @@ public class GlobalExceptionHandler {
 
     //hanlde method not valid exceptions
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException
+    public ResponseEntity<Map<String,String>> handleMethodArgumentNotValidException
             (MethodArgumentNotValidException exception){
 
+        Map<String,String> errorResponse = new HashMap<>();
+//        exception.getBindingResult().getAllErrors().forEach(error->
+//        {
+//            String errorMessage =error.getDefaultMessage();
+//            String field =((FieldError)error).getField();
+//            errorResponse.put(field,errorMessage);
+//        });
+
+        exception.getBindingResult().getFieldErrors().forEach(error ->
+                errorResponse.put(error.getField(), error.getDefaultMessage()));
+        ResponseEntity<Map<String,String>> error= new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+        return error;
     }
 }
 
