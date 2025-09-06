@@ -11,7 +11,7 @@ public class Train {
     @Size(min =3 ,max=20,message = "Invalid Length of Train Number")
     @Pattern(regexp="^\\d+$",message="Train no can only contain numbers")
     private String trainNo ;
-    @Pattern(regexp="^[A-Za-z]+([ -][A-Za-z]+)*$\n", message="Only alphabets spaces and hyphens are allowed ")
+    @Pattern(regexp="^[A-Za-z\\s-]+$", message="Only alphabets spaces and hyphens are allowed ")
     private String name;
     @ValidCoach
     private int coaches;
