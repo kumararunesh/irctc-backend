@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
             (MethodArgumentNotValidException exception){
 
         Map<String,String> errorResponse = new HashMap<>();
+        //using Object Type Casting
 //        exception.getBindingResult().getAllErrors().forEach(error->
 //        {
 //            String errorMessage =error.getDefaultMessage();

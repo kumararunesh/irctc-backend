@@ -1,7 +1,9 @@
 package com.arunesh.irctc.irctc_backend.controllers;
 
 import com.arunesh.irctc.irctc_backend.dto.ErrorResponse;
+import com.arunesh.irctc.irctc_backend.entities.ImageMetaData;
 import com.arunesh.irctc.irctc_backend.entities.Train;
+import com.arunesh.irctc.irctc_backend.services.FileUploadService;
 import com.arunesh.irctc.irctc_backend.services.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,22 +31,17 @@ public class TrainController {
     @Autowired
     private TrainService trainService;
 
+    @Autowired
+    private FileUploadService fileUploadService;
+
     @PostMapping("/photo")
-    public String uploadTrainPhoto(@RequestParam("file") MultipartFile file) throws IOException {
+    public ImageMetaData uploadTrainPhoto(@RequestParam("file") MultipartFile file) throws IOException {
         //process file
-        String originalFilename=file.getOriginalFilename();
-        System.out.println(originalFilename+" is uploaded succesfullly");
-        InputStream inputStream =file.getInputStream();
-        String folder = "uploads/";
-        String fileNameWithPath=folder+ UUID.randomUUID()+originalFilename;
 
-        if(!Files.exists(Paths.get(folder))){
-            System.out.println("Creating Folder");
-            Files.createDirectories(Paths.get(folder));
-        }
+        ImageMetaData imageMetaData = fileUploadService.upload(file);
+        //using reposiotruy save to DB
+        return imageMetaData;
 
-            Files.copy(file.getInputStream(),Paths.get(fileNameWithPath), StandardCopyOption.REPLACE_EXISTING);
-        return "Uploaded";
     }
 
     @RequestMapping(value="" ,method = RequestMethod.GET)
