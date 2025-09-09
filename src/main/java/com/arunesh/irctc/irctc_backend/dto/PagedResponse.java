@@ -1,14 +1,34 @@
 package com.arunesh.irctc.irctc_backend.dto;
 
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 
-public class PagedResponse <T>{
+public record PagedResponse <T>(
 
-    List<T> content;
-    int pageNumber;
-    int size;
-    Long totalElements;
-    boolean last;
+    List<T> content,
+    int pageNumber,
+    int size,
+    Long totalElements,
+    int totalPages,
+    boolean last,
+    boolean first){
 
-    
+
+
+    public static <T> PagedResponse<T> fromPage(Page<T> page)
+    {
+        return new PagedResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.isFirst()
+
+        );
+
+
+    }
 }

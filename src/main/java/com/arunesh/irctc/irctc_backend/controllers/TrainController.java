@@ -1,6 +1,7 @@
 package com.arunesh.irctc.irctc_backend.controllers;
 
 import com.arunesh.irctc.irctc_backend.dto.ErrorResponse;
+import com.arunesh.irctc.irctc_backend.dto.PagedResponse;
 import com.arunesh.irctc.irctc_backend.dto.TrainDto;
 import com.arunesh.irctc.irctc_backend.entities.ImageMetaData;
 import com.arunesh.irctc.irctc_backend.entities.Train;
@@ -47,7 +48,7 @@ public class TrainController {
     }
 
     @RequestMapping(value="" ,method = RequestMethod.GET)
-    public Page<TrainDto> getAllTrains(
+    public PagedResponse<TrainDto> getAllTrains(
             @RequestParam(value= "page" ,defaultValue = "0") int page,
             @RequestParam(value= "size" ,defaultValue = "10") int size,
             @RequestParam(value= "sortBy" ,defaultValue = "name") String sortBy,

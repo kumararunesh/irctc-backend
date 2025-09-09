@@ -1,5 +1,6 @@
 package com.arunesh.irctc.irctc_backend.services;
 
+import com.arunesh.irctc.irctc_backend.dto.PagedResponse;
 import com.arunesh.irctc.irctc_backend.dto.TrainDto;
 import com.arunesh.irctc.irctc_backend.entities.Train;
 import com.arunesh.irctc.irctc_backend.exceptions.ResourceNotFoundException;
@@ -52,7 +53,7 @@ public class TrainService {
         return savedTrainDto;
     }
 
-    public Page<TrainDto> all(int page,int size,String sortBy,String sortDir)
+    public PagedResponse<TrainDto> all(int page, int size, String sortBy, String sortDir)
     {
 
         //sorting
@@ -63,7 +64,9 @@ public class TrainService {
        // List<Train> trainsList =trainPage.getContent();
 
 
-       return trainPage.map(train->modelMapper.map(train,TrainDto.class));
+        Page<TrainDto> trainDtoPage = trainPage.map(train -> modelMapper.map(train, TrainDto.class));
+
+        return  PagedResponse.fromPage(trainDtoPage);
     }
 
     public TrainDto get(String trainNo)
