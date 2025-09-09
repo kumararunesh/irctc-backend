@@ -3,29 +3,21 @@ package com.arunesh.irctc.irctc_backend.controllers;
 import com.arunesh.irctc.irctc_backend.dto.ErrorResponse;
 import com.arunesh.irctc.irctc_backend.dto.PagedResponse;
 import com.arunesh.irctc.irctc_backend.dto.TrainDto;
-import com.arunesh.irctc.irctc_backend.entities.ImageMetaData;
-import com.arunesh.irctc.irctc_backend.entities.Train;
-import com.arunesh.irctc.irctc_backend.services.FileUploadService;
+import com.arunesh.irctc.irctc_backend.dto.TrainImageDataWithResource;
+import com.arunesh.irctc.irctc_backend.entities.TrainImage;
+import com.arunesh.irctc.irctc_backend.services.TrainImageService;
 import com.arunesh.irctc.irctc_backend.services.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.net.MalformedURLException;
 
 @RestController
 @RequestMapping("/trains")
@@ -35,17 +27,7 @@ public class TrainController {
     private TrainService trainService;
 
     @Autowired
-    private FileUploadService fileUploadService;
-
-    @PostMapping("/photo")
-    public ImageMetaData uploadTrainPhoto(@RequestParam("file") MultipartFile file) throws IOException {
-        //process file
-
-        ImageMetaData imageMetaData = fileUploadService.upload(file);
-        //using reposiotruy save to DB
-        return imageMetaData;
-
-    }
+    private TrainImageService trainImageService;
 
     @RequestMapping(value="" ,method = RequestMethod.GET)
     public PagedResponse<TrainDto> getAllTrains(
@@ -80,6 +62,38 @@ public class TrainController {
     }
 
 
+
+    @PostMapping("/{trainNo}/upload-image")
+    public ResponseEntity<?> uploadTrainImage(
+
+            @PathVariable String trainNo,
+            @RequestParam ("image") MultipartFile image
+    ) throws IOException {
+
+        String contentType=image.getContentType() ;
+        System.out.println(contentType);
+
+        if(contentType.toLowerCase().startsWith("image/"))
+        {
+            return new ResponseEntity<>(trainImageService.upload(image,trainNo),HttpStatus.CREATED);
+        }
+        else {
+            return new ResponseEntity<>
+                    (new ErrorResponse("Image not uploaded","403",false),
+                          HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @GetMapping("/{trainNo}/serve-image")
+    public ResponseEntity<Resource> serveTrainImage(@PathVariable("trainNo") String trainNo) throws MalformedURLException {
+        TrainImageDataWithResource trainImageDataWithResource = trainImageService.loadImageByTrainNo(trainNo);
+        TrainImage trainImage = trainImageDataWithResource.trainImage();
+
+
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(trainImage.getFileType()))
+                .body(trainImageDataWithResource.resource());
+    }
 
 
 }
