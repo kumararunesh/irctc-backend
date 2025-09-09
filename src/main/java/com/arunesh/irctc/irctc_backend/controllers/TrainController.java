@@ -7,6 +7,7 @@ import com.arunesh.irctc.irctc_backend.entities.Train;
 import com.arunesh.irctc.irctc_backend.services.FileUploadService;
 import com.arunesh.irctc.irctc_backend.services.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -46,10 +47,16 @@ public class TrainController {
     }
 
     @RequestMapping(value="" ,method = RequestMethod.GET)
-    public List<TrainDto> getAllTrains()
+    public Page<TrainDto> getAllTrains(
+            @RequestParam(value= "page" ,defaultValue = "0") int page,
+            @RequestParam(value= "size" ,defaultValue = "10") int size,
+            @RequestParam(value= "sortBy" ,defaultValue = "name") String sortBy,
+            @RequestParam(value= "sortDir" ,defaultValue = "asc") String sortDir
+
+
+    )
     {
-        System.out.println("Inside API");
-        return this.trainService.all();
+        return this.trainService.all(page,size,sortBy,sortDir);
     }
 
     @GetMapping("/{id}")

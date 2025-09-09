@@ -5,6 +5,10 @@ import com.arunesh.irctc.irctc_backend.entities.Train;
 import com.arunesh.irctc.irctc_backend.exceptions.ResourceNotFoundException;
 import com.arunesh.irctc.irctc_backend.repositories.TrainRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -48,17 +52,18 @@ public class TrainService {
         return savedTrainDto;
     }
 
-    public List<TrainDto> all()
+    public Page<TrainDto> all(int page,int size,String sortBy,String sortDir)
     {
-        
-        
-        List<Train> trainsList = this.trainRepository.findAll();
 
-        List<TrainDto> trainsDtoList = trainsList.stream()
-                .map(train -> modelMapper.map(train, TrainDto.class))
-                .toList();
+        //sorting
+        Sort sort = sortBy.trim().toLowerCase().equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page,size,sort);
 
-        return trainsDtoList;
+        Page<Train> trainPage = this.trainRepository.findAll(pageable);
+       // List<Train> trainsList =trainPage.getContent();
+
+
+       return trainPage.map(train->modelMapper.map(train,TrainDto.class));
     }
 
     public TrainDto get(String trainNo)
