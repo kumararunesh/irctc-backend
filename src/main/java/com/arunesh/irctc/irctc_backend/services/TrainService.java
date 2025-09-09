@@ -1,7 +1,10 @@
 package com.arunesh.irctc.irctc_backend.services;
 
+import com.arunesh.irctc.irctc_backend.dto.TrainDto;
 import com.arunesh.irctc.irctc_backend.entities.Train;
 import com.arunesh.irctc.irctc_backend.exceptions.ResourceNotFoundException;
+import com.arunesh.irctc.irctc_backend.repositories.TrainRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,38 +17,64 @@ import java.util.NoSuchElementException;
 @Service
 public class TrainService {
 
-    List<Train> trains = new ArrayList<>();
 
-    public TrainService()
-    {
-        trains.add(new Train("1234","DEL-BAN SUP",12));
-        trains.add(new Train("4567","PAT-MUM RAJ",20));
-    }
+    private TrainRepository trainRepository;
 
-    public Train add (Train train)
-    {
-        trains.add(train);
-        return train;
+    public ModelMapper modelMapper;
+
+    public TrainService(TrainRepository trainRepository, ModelMapper modelMapper) {
+        this.trainRepository = trainRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Train> all()
+    public TrainDto add (TrainDto trainDto)
     {
-        return trains;
+
+//        Train train = new Train();
+//        train.setName(trainDto.getName());
+//        train.setTrainNo(trainDto.getTrainNo());
+//        train.setRouteName(trainDto.getRouteName());
+
+        Train train = modelMapper.map(trainDto,Train.class);
+
+        Train savedTrain = this.trainRepository.save(train);
+
+//        TrainDto savedTrainDto =new TrainDto();
+//        savedTrainDto.setName(savedTrain.getName());
+//        savedTrainDto.setRouteName(savedTrain.getRouteName());
+//        savedTrainDto.setTrainNo(savedTrain.getTrainNo());
+
+        TrainDto savedTrainDto = modelMapper.map(train,TrainDto.class);
+        return savedTrainDto;
     }
-//    public Train get(String trainNo)
-//    {
-//        return trains.stream().filter(x->x.getTrainNo().equals(trainNo)).
-//                findFirst().orElseThrow(()->new NoSuchElementException("No train found with train no:"+trainNo));
-//    }
-    public Train get(String trainNo)
+
+    public List<TrainDto> all()
     {
-        return trains.stream().filter(x->x.getTrainNo().equals(trainNo)).
-                findFirst().orElseThrow(()->new ResourceNotFoundException("No train found with train no:"+trainNo));
+        
+        
+        List<Train> trainsList = this.trainRepository.findAll();
+
+        List<TrainDto> trainsDtoList = trainsList.stream()
+                .map(train -> modelMapper.map(train, TrainDto.class))
+                .toList();
+
+        return trainsDtoList;
     }
+
+    public TrainDto get(String trainNo)
+    {
+        Train train = trainRepository.findById(trainNo)
+                .orElseThrow(() -> new ResourceNotFoundException("Train not found with train no. " + trainNo));
+        return modelMapper.map(train,TrainDto.class);
+
+       }
 
 
     public void delete(String trainNo)
     {
-       trains = this.trains.stream().filter(x -> !x.getTrainNo().equals(trainNo)).toList();
+        Train train = trainRepository.findById(trainNo)
+                .orElseThrow(() -> new ResourceNotFoundException("Train not found with train no. " + trainNo));
+
+        trainRepository.delete(train);
     }
 }

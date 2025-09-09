@@ -1,6 +1,7 @@
 package com.arunesh.irctc.irctc_backend.controllers;
 
 import com.arunesh.irctc.irctc_backend.dto.ErrorResponse;
+import com.arunesh.irctc.irctc_backend.dto.TrainDto;
 import com.arunesh.irctc.irctc_backend.entities.ImageMetaData;
 import com.arunesh.irctc.irctc_backend.entities.Train;
 import com.arunesh.irctc.irctc_backend.services.FileUploadService;
@@ -45,22 +46,22 @@ public class TrainController {
     }
 
     @RequestMapping(value="" ,method = RequestMethod.GET)
-    public List<Train> getAllTrains()
+    public List<TrainDto> getAllTrains()
     {
         System.out.println("Inside API");
         return this.trainService.all();
     }
 
     @GetMapping("/{id}")
-    public Train getTrain(@PathVariable("id") String trainNo)
+    public ResponseEntity<TrainDto> getTrain(@PathVariable("id") String trainNo)
     {
-        return this.trainService.get(trainNo);
+        return new ResponseEntity<>(this.trainService.get(trainNo),HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Train> addTrain(@Validated @RequestBody Train train)
+    public ResponseEntity<TrainDto> addTrain(@Validated @RequestBody TrainDto trainDto)
     {
-        return new ResponseEntity<Train>(this.trainService.add(train), HttpStatus.CREATED);
+        return new ResponseEntity<TrainDto>(this.trainService.add(trainDto), HttpStatus.CREATED);
     }
 
 

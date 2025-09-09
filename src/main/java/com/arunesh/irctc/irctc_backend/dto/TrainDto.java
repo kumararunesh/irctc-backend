@@ -1,33 +1,24 @@
-package com.arunesh.irctc.irctc_backend.entities;
+package com.arunesh.irctc.irctc_backend.dto;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name="trains")
-public class Train {
+public class TrainDto {
 
-
-    @Id
+    @NotEmpty(message = "Train number is required !!")
+    @Size(min =3 ,max=20,message = "Invalid Length of Train Number")
+    @Pattern(regexp="^\\d+$",message="Train no can only contain numbers")
     private String trainNo ;
 
+    @Pattern(regexp="^[A-Za-z\\s-]+$", message="Only alphabets spaces and hyphens are allowed ")
     private String name;
-//    @ValidCoach
-//    private int coaches;
+
 
     private String routeName;
-    public Train() {
-    }
 
-    public Train(String trainNo, String name, String routeNAme) {
-        this.trainNo = trainNo;
-        this.name = name;
-        this.routeName = routeNAme;
-    }
+
 
     public String getTrainNo() {
         return trainNo;
